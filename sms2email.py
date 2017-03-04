@@ -73,7 +73,7 @@ class ThreadEmailSender(threading.Thread):
 
 if __name__ == '__main__':
     t = ThreadEmailSender(mq)
-    t.setDeamon(True)
+    t.setDaemon(True)
     t.start()
     print 'worker emailsender is OK'
     while(1):
