@@ -29,18 +29,41 @@ sys.stdout = streamWriter(sys.stdout)
 
 UPDATE_DATE = -1
 UPDATE_CHECK_SECONDS = 30
-SMSDB_PATH = '/var/mobile/Library/SMS/sms.db'
-SQL_QUERY_TEMPLATE = string.Template(
-    '''select date, hd.id, text from message as msg, handle as hd where msg.handle_id=hd.rowid and date>${date} order by msg.date desc limit 10''')
-# sql index
-# date=0
-# author=1
-# text=2
 
-SMSDB = sql.connect(SMSDB_PATH)
-SMSDB_CURSOR = SMSDB.cursor()
 mail = pymail.Pymail(os.environ.get('USER_MAIL'), os.environ.get('USER_PASSWD'), os.environ.get('MAIL_TO'))
 mq = Queue()
+
+
+class SMSDBMonitor(object):
+
+    def __init__(self):
+        self.SMSDB_PATH = '/var/mobile/Library/SMS/sms.db'
+        self.SQL_QUERY_TEMPLATE = string.Template(
+            '''select date, hd.id, text from message as msg, handle as hd where msg.handle_id=hd.rowid and date>${date} order by msg.date desc limit 10''')
+        # sql index
+        # date=0
+        # author=1
+        # text=2
+        self.SMSDB = sql.connect(self.SMSDB_PATH)
+        self.SMSDB_CURSOR = self.SMSDB.cursor()
+
+    def fetch_update(self, date):
+        self.SMSDB_CURSOR.execute(self.SQL_QUERY_TEMPLATE.safe_substitute(date=date))
+        return self.SMSDB_CURSOR.fetchall()
+
+    def fetch_recent_history(self, num=2):
+        self.SMSDB_CURSOR.execute(
+            '''select date, hd.id, text from message as msg, handle as hd where msg.handle_id=hd.rowid order by msg.date desc limit ''' + num)
+        return self.SMSDB_CURSOR.fetchall()
+
+
+def email_sender():
+    '''worker
+    '''
+    item = mq.get()
+    if item:
+        mail.send_mail('SMS on IPhone4', msg_body)
+    mq.task_done()
 
 
 def message_date(mac_time):
@@ -76,18 +99,17 @@ if __name__ == '__main__':
     t.setDaemon(True)
     t.start()
     print 'worker emailsender is OK'
+    smsdb_monitor = SMSDBMonitor()
     while(1):
         if UPDATE_DATE > 0:
-            SMSDB_CURSOR.execute(SQL_QUERY_TEMPLATE.safe_substitute(date=UPDATE_DATE))
-            message_data = SMSDB_CURSOR.fetchall()
+            message_data = smsdb_monitor.fetch_update(UPDATE_DATE)
             if message_data:
                 UPDATE_DATE = int(message_data[0][0])
                 msg_body = build_content(message_data)
                 mq.put(msg_body)                
         else:
             # INIT
-            SMSDB_CURSOR.execute('''select date, hd.id, text from message as msg, handle as hd where msg.handle_id=hd.rowid order by msg.date desc limit 2''')
-            message_data = SMSDB_CURSOR.fetchall()
+            message_data = smsdb_monitor.fetch_recent_history()
             UPDATE_DATE = int(message_data[0][0])
             msg_body = build_content(message_data)
             mq.put('init OK, SMS monitor has is running. recent messge is \n' + msg_body)
