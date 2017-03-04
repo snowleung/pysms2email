@@ -30,7 +30,6 @@ sys.stdout = streamWriter(sys.stdout)
 UPDATE_DATE = -1
 UPDATE_CHECK_SECONDS = 30
 
-mail = pymail.Pymail(os.environ.get('USER_MAIL'), os.environ.get('USER_PASSWD'), os.environ.get('MAIL_TO'))
 mq = Queue()
 
 
@@ -53,17 +52,8 @@ class SMSDBMonitor(object):
 
     def fetch_recent_history(self, num=2):
         self.SMSDB_CURSOR.execute(
-            '''select date, hd.id, text from message as msg, handle as hd where msg.handle_id=hd.rowid order by msg.date desc limit ''' + num)
+            '''select date, hd.id, text from message as msg, handle as hd where msg.handle_id=hd.rowid order by msg.date desc limit ''' + str(num))
         return self.SMSDB_CURSOR.fetchall()
-
-
-def email_sender():
-    '''worker
-    '''
-    item = mq.get()
-    if item:
-        mail.send_mail('SMS on IPhone4', msg_body)
-    mq.task_done()
 
 
 def message_date(mac_time):
@@ -82,20 +72,22 @@ def build_content(message_data):
     return msg_body
 
 class ThreadEmailSender(threading.Thread):
-    def __init__(self, _queue):
+    def __init__(self, _queue, _sender):
         threading.Thread.__init__(self)
         self.queue = _queue
+        self.sender = _sender
 
     def run(self):
         while(True):
             item = self.queue.get()
             if item:
-                mail.send_mail('SMS on IPhone4', msg_body)
+                self.sender.send_mail('SMS on IPhone4', msg_body)
             time.sleep(2)
             
 
 if __name__ == '__main__':
-    t = ThreadEmailSender(mq)
+    mail = pymail.Pymail(os.environ.get('USER_MAIL'), os.environ.get('USER_PASSWD'), os.environ.get('MAIL_TO'))
+    t = ThreadEmailSender(mq, mail)
     t.setDaemon(True)
     t.start()
     print 'worker emailsender is OK'
