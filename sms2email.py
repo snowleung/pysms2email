@@ -43,15 +43,6 @@ mail = pymail.Pymail(os.environ.get('USER_MAIL'), os.environ.get('USER_PASSWD'),
 mq = Queue()
 
 
-def email_sender():
-    '''worker
-    '''
-    item = mq.get()
-    if item:
-        mail.send_mail('SMS on IPhone4', msg_body)
-    mq.task_done()
-
-
 def message_date(mac_time):
     '''see: http://stackoverflow.com/questions/10746562/parsing-date-field-of-iphone-sms-file-from-backup
     '''
@@ -67,9 +58,24 @@ def build_content(message_data):
         msg_body += _body.safe_substitute(author=str(m[1]), text=m[2], date=message_date(m[0]))
     return msg_body
 
+class ThreadEmailSender(threading.Thread):
+    def __init__(self, _queue):
+        threading.Thread.__init__(self)
+        self.queue = _queue
+
+    def run(self):
+        while(True):
+            item = self.queue.get()
+            if item:
+                mail.send_mail('SMS on IPhone4', msg_body)
+            time.sleep(2)
+            
 
 if __name__ == '__main__':
-    print 'worker sender is OK'
+    t = ThreadEmailSender(mq)
+    t.setDeamon(True)
+    t.start()
+    print 'worker emailsender is OK'
     while(1):
         if UPDATE_DATE > 0:
             SMSDB_CURSOR.execute(SQL_QUERY_TEMPLATE.safe_substitute(date=UPDATE_DATE))
@@ -77,15 +83,12 @@ if __name__ == '__main__':
             if message_data:
                 UPDATE_DATE = int(message_data[0][0])
                 msg_body = build_content(message_data)
-                mq.put(msg_body)
-                t = threading.Thread(target=email_sender)
-                t.daemon = True
-                t.start()
-                time.sleep(UPDATE_CHECK_SECONDS)
+                mq.put(msg_body)                
         else:
             # INIT
             SMSDB_CURSOR.execute('''select date, hd.id, text from message as msg, handle as hd where msg.handle_id=hd.rowid order by msg.date desc limit 2''')
             message_data = SMSDB_CURSOR.fetchall()
             UPDATE_DATE = int(message_data[0][0])
             msg_body = build_content(message_data)
-            mail.send_mail('SMS Monitor', 'init OK, SMS monitor has is running. recent messge is \n' + msg_body)
+            mq.put('init OK, SMS monitor has is running. recent messge is \n' + msg_body)
+        time.sleep(UPDATE_CHECK_SECONDS)
