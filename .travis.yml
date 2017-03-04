@@ -5,9 +5,9 @@ python:
 install:
   - "pip install -r requirements.txt"
 env:
-  - USER_MAIL="your_email_address_here"
-  - USER_PASSWD="your_email_password"
-  - MAIL_TO="your_recive_email_list_split_with_','_like_a@gmail.com,b@gmail.com"
-
+  global:
+    - USER_MAIL="your_email_address_here"
+    - USER_PASSWD="your_email_password"
+    - MAIL_TO="your_recive_email_list_split_with_','_like_a@gmail.com,b@gmail.com"
 #command to run tests
 script: pytest
