@@ -106,8 +106,8 @@ if __name__ == '__main__':
     init_diagnostic_file_path = './.diagnostic'
     while(1):
         diag_content = run_diagnostic(init_diagnostic_file_path)
-        if content:
-            mq.put(str(content))
+        if diag_content:
+            mq.put(str(diag_content))
             os.remove(init_diagnostic_file_path)
         if UPDATE_DATE > 0:
             message_data = smsdb_monitor.fetch_update(UPDATE_DATE)
