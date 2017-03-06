@@ -83,7 +83,7 @@ class ThreadEmailSender(threading.Thread):
         while(True):
             item = self.queue.get()
             if item:
-                self.sender.send_mail('SMS on IPhone4', msg_body)
+                self.sender.send_mail('SMS on IPhone4', item)
             time.sleep(2)
 
 
