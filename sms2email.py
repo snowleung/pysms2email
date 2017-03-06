@@ -71,7 +71,9 @@ def build_content(message_data):
         msg_body += _body.safe_substitute(author=str(m[1]), text=m[2], date=message_date(m[0]))
     return msg_body
 
+
 class ThreadEmailSender(threading.Thread):
+
     def __init__(self, _queue, _sender):
         threading.Thread.__init__(self)
         self.queue = _queue
@@ -83,7 +85,16 @@ class ThreadEmailSender(threading.Thread):
             if item:
                 self.sender.send_mail('SMS on IPhone4', msg_body)
             time.sleep(2)
-            
+
+
+def run_diagnostic(init_diagnostic_file_path='./diagnostic'):
+    content = None
+    if os.path.exists(init_diagnostic_file_path):
+        f = open(init_diagnostic_file_path, 'r')
+        content = f.read()
+        f.close()
+    return content
+
 
 if __name__ == '__main__':
     mail = pymail.Pymail(os.environ.get('USER_MAIL'), os.environ.get('USER_PASSWD'), os.environ.get('MAIL_TO'))
@@ -92,13 +103,18 @@ if __name__ == '__main__':
     t.start()
     print 'worker emailsender is OK'
     smsdb_monitor = SMSDBMonitor()
+    init_diagnostic_file_path = './.diagnostic'
     while(1):
+        diag_content = run_diagnostic(init_diagnostic_file_path)
+        if content:
+            mq.put(str(content))
+            os.remove(init_diagnostic_file_path)
         if UPDATE_DATE > 0:
             message_data = smsdb_monitor.fetch_update(UPDATE_DATE)
             if message_data:
                 UPDATE_DATE = int(message_data[0][0])
                 msg_body = build_content(message_data)
-                mq.put(msg_body)                
+                mq.put(msg_body)
         else:
             # INIT
             message_data = smsdb_monitor.fetch_recent_history()
