@@ -17,8 +17,8 @@
       command: launchctl start deploys.environments.mail
     
   tasks:
-    # - name: stop launchctl
-    #   command: launchctl stop deploys.pychgoods.monitor
+    - name: stop launchctl
+      command: launchctl stop "deploys.{{ project_name }}.monitor"
     - name: copy source code
       copy:
         src: ../pysms2email
