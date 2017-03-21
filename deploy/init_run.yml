@@ -18,7 +18,9 @@
         src: ../pysms2email
         dest: "{{ deploy_path }}/"
     - name: chmod +x to file
-      command: chmod +x {{ entry_file }}
+      file:
+        dest: {{ entry_file }}
+        mode: "u+x,g+x,o+x"
     - name: create log folder
       command: mkdir -p {{ log_path }}
     - name: copy environment variable plist
