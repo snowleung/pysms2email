@@ -4,37 +4,37 @@
     - secrets.yml
   vars:
     project_name: pysms2email
-    entry_file: /var/root/deploys/pysms2email/sms2email.py
-    deploy_path: /var/root/deploys
     project_path: /var/root/deploys/pysms2email
+    deploy_path: /var/root/deploys    
+    entry_file: /var/root/deploys/pysms2email/sms2email.py
     launchctl_path: /Library/LaunchDaemons
+    log_path: /var/root/log/deploys/
   handlers:
-    - name: launchctl stop "deploys.{{ project_name }}.monitor"
-      command: launchctl stop "deploys.{{ project_name }}.monitor"
-    - name: launchctl start "{{ project_name }}"
-      command: launchctl start "deploys.{{ project_name }}.monitor"
-    - name: launchctl start env
-      command: launchctl start deploys.environments.mail
+    - name: reboot
+      command: reboot
   tasks:
-    - name: stop launchctl
-      command: launchctl stop "deploys.{{ project_name }}.monitor"
     - name: copy source code
       copy:
         src: ../pysms2email
         dest: "{{ deploy_path }}/"
     - name: chmod +x to file
       command: chmod +x "{{ entry_file }}"
+    - name: create log folder
+      command: mkdir -p {{ log_path }}
     - name: copy plist environment variable
       template:
         src: ./files/deploys.environments.mail.plist
         dest: "{{ launchctl_path }}/deploys.environments.mail.plist"
-    - name: load environment variable
+    - name: load environment to launchctl
       command: "launchctl load {{ launchctl_path }}/deploys.environments.mail.plist"
-      notify: launchctl start env
-    - name: update apple launchctl
+    - name: execute environments
+      commnad: launchctl start deploys.environments.mail
+
+    - name: copy {{ project_name }} to launchctl
       template:
         src: "./files/deploys.{{ project_name }}.monitor.plist"
         dest: "{{ launchctl_path }}/deploys.{{ project_name }}.monitor.plist"
     - name: load {{ project_name }} plist
       command: "launchctl load {{ launchctl_path }}/deploys.{{ project_name }}.monitor.plist"
-      notify: launchctl start "{{ project_name }}"
+    - name: execute {{ project_name }} plist
+      commnad: launchctl start deploys.{{ project_name }}.mail

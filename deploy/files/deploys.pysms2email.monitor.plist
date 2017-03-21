@@ -20,11 +20,10 @@
 
     <!-- 标准输出文件 -->
     <key>StandardOutPath</key>
-    <string>/var/log/deploys/output.log</string>
+    <string>{{ log_path }}/{{ project_name }}.log</string>
 
     <!-- 标准错误输出文件 -->
     <key>StandardErrorPath</key>
-    <string>/var/log/deploys/output-err.log</string>
-
+    <string>{{ log_path }}/{{ project_name }}_err.log</string>
   </dict>  
 </plist>
