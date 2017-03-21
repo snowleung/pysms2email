@@ -24,11 +24,6 @@
         dest: "{{ deploy_path }}/"
     - name: chmod +x to file
       command: chmod +x "{{ entry_file }}"
-    - name: set launchctl environment variable
-      template:
-        src: ./files/envs.sh
-        dest: "{{ deploy_path }}/envs.sh"
-        mode: "u+x,g+x,o+x"
     - name: copy plist environment variable
       template:
         src: ./files/deploys.environments.mail.plist
