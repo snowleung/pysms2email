@@ -1,5 +1,0 @@
-#!/bin/sh
-
-export USER_MAIL="your email address here"
-export USER_PASSWD="your email password"
-export MAIL_TO="your recive email list split with ',' like a@gmail.com,b@gmail.com"
