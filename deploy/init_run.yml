@@ -8,7 +8,7 @@
     deploy_path: /var/root/deploys    
     entry_file: /var/root/deploys/pysms2email/sms2email.py
     launchctl_path: /Library/LaunchDaemons
-    log_path: /var/root/log/deploys
+    log_path: /var/log/deploys
   handlers:
     - name: reboot
       command: reboot
@@ -19,10 +19,13 @@
         dest: "{{ deploy_path }}/"
     - name: chmod +x to file
       file:
-        dest: "{{ entry_file }}"
+        path: "{{ entry_file }}"
         mode: "u+x,g+x,o+x"
     - name: create log folder
-      command: mkdir -p {{ log_path }}
+      file:
+        path: "{{ log_path }}"
+        state: directory
+        mode: "u+wrx,g+rx,o+rx"
     - name: copy environment variable plist
       template:
         src: ./files/deploys.environments.mail.plist
