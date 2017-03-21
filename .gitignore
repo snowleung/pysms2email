@@ -1,5 +1,10 @@
+#user passw
+secrets.yml
 
 # Created by https://www.gitignore.io/api/python,osx,emacs,vim
+
+### Ansible ###
+*.retry
 
 ### Emacs ###
 # -*- mode: gitignore; -*-
