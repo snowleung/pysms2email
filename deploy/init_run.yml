@@ -8,7 +8,7 @@
     deploy_path: /var/root/deploys    
     entry_file: /var/root/deploys/pysms2email/sms2email.py
     launchctl_path: /Library/LaunchDaemons
-    log_path: /var/root/log/deploys/
+    log_path: /var/root/log/deploys
   handlers:
     - name: reboot
       command: reboot
@@ -18,23 +18,22 @@
         src: ../pysms2email
         dest: "{{ deploy_path }}/"
     - name: chmod +x to file
-      command: chmod +x "{{ entry_file }}"
+      command: chmod +x {{ entry_file }}
     - name: create log folder
       command: mkdir -p {{ log_path }}
-    - name: copy plist environment variable
+    - name: copy environment variable plist
       template:
         src: ./files/deploys.environments.mail.plist
         dest: "{{ launchctl_path }}/deploys.environments.mail.plist"
     - name: load environment to launchctl
-      command: "launchctl load {{ launchctl_path }}/deploys.environments.mail.plist"
+      command: launchctl load "{{ launchctl_path }}/deploys.environments.mail.plist"
     - name: execute environments
-      commnad: launchctl start deploys.environments.mail
-
-    - name: copy {{ project_name }} to launchctl
+      command: launchctl start deploys.environments.mail
+    - name: copy project plist to launchctl
       template:
-        src: "./files/deploys.{{ project_name }}.monitor.plist"
+        src: ./files/deploys.{{ project_name }}.monitor.plist
         dest: "{{ launchctl_path }}/deploys.{{ project_name }}.monitor.plist"
-    - name: load {{ project_name }} plist
-      command: "launchctl load {{ launchctl_path }}/deploys.{{ project_name }}.monitor.plist"
-    - name: execute {{ project_name }} plist
-      commnad: launchctl start deploys.{{ project_name }}.mail
+    - name: load project plist
+      command: launchctl load {{ launchctl_path }}/deploys.{{ project_name }}.monitor.plist
+    - name: execute project plist
+      command: launchctl start deploys.{{ project_name }}.monitor
