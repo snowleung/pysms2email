@@ -27,7 +27,7 @@
         state: directory
         mode: "u+wrx,g+rx,o+rx"
     - name: stop environment to launchctl
-      command: launchctl stop "{{ launchctl_path }}/deploys.environments.mail"
+      command: launchctl stop deploys.environments.mail
     - name: unload environment to launchctl
       command: launchctl unload "{{ launchctl_path }}/deploys.environments.mail.plist"
     - name: copy environment variable plist
