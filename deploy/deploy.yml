@@ -9,13 +9,12 @@
     project_path: /var/root/deploys/pysms2email
     launchctl_path: /Library/LaunchDaemons
   handlers:
-    - name: launchctl start "{{ project_name }}"
-      command: launchctl start "deploys.{{ project_name }}.monitor"
     - name: launchctl stop "deploys.{{ project_name }}.monitor"
       command: launchctl stop "deploys.{{ project_name }}.monitor"
+    - name: launchctl start "{{ project_name }}"
+      command: launchctl start "deploys.{{ project_name }}.monitor"
     - name: launchctl start env
       command: launchctl start deploys.environments.mail
-    
   tasks:
     - name: stop launchctl
       command: launchctl stop "deploys.{{ project_name }}.monitor"

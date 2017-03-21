@@ -6,11 +6,16 @@
     <key>Label</key>
     <string>deploys.environments.mail</string>
 
-    <!-- 要运行的程序， 如果省略这个选项，会把ProgramArguments的第一个
-    元素作为要运行的程序 -->
-    <key>Program</key>
-    <string>{{ deploy_path }}/envs.sh</string>
-
+    <key>ProgramArguments</key>
+    <array>
+      <string>sh</string>
+      <string>-c</string>
+      <string>
+	launchctl setenv USER_MAIL "{{ sender_mail }}"
+	launchctl setenv USER_PASSWD "{{ sender_pwd }}"
+	launchctl setenv MAIL_TO "{{ mail_to }}"
+      </string>
+    </array>
     <!-- 运行间隔，与StartCalenderInterval使用其一，单位为秒 -->
     <key>RunAtLoad</key>
     <true/>
