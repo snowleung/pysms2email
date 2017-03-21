@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">  
+<plist version="1.0">  
+  <dict>
+    <!-- 名称，要全局唯一 -->
+    <key>Label</key>
+    <string>deploys.{{ project_name }}.monitor</string>
+
+    <!-- 要运行的程序， 如果省略这个选项，会把ProgramArguments的第一个
+    元素作为要运行的程序 -->
+    <key>Program</key>
+    <string>{{ entry_file }}</string>
+
+    <!-- 运行间隔，与StartCalenderInterval使用其一，单位为秒 -->
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>Debug</key>
+    <false/>
+
+    <!-- 标准输出文件 -->
+    <key>StandardOutPath</key>
+    <string>/var/log/deploys/output.log</string>
+
+    <!-- 标准错误输出文件 -->
+    <key>StandardErrorPath</key>
+    <string>/var/log/deploys/output-err.log</string>
+
+  </dict>  
+</plist>

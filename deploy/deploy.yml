@@ -3,15 +3,19 @@
   vars_files:
     - secrets.yml
   vars:
+    project_name: pysms2email
     entry_file: /var/root/deploys/pysms2email/sms2email.py
     deploy_path: /var/root/deploys
     project_path: /var/root/deploys/pysms2email
     launchctl_path: /Library/LaunchDaemons
   handlers:
-    - name: launchctl start pychgoods
-      command: launchctl start deploys.pychgoods.monitor
-    - name: launchctl stop pychgoods
-      command: launchctl stop deploys.pychgoods.monitor
+    - name: launchctl start "{{ project_name }}"
+      command: launchctl start "deploys.{{ project_name }}.monitor"
+    - name: launchctl stop "deploys.{{ project_name }}.monitor"
+      command: launchctl stop "deploys.{{ project_name }}.monitor"
+    - name: launchctl start env
+      command: launchctl start deploys.environments.mail
+    
   tasks:
     # - name: stop launchctl
     #   command: launchctl stop deploys.pychgoods.monitor
@@ -27,19 +31,16 @@
         dest: "{{ deploy_path }}/envs.sh"
         mode: "u+x,g+x,o+x"
     - name: copy plist environment variable
-      copy:
+      template:
         src: ./files/deploys.environments.mail.plist
         dest: "{{ launchctl_path }}/deploys.environments.mail.plist"
     - name: load environment variable
       command: "launchctl load {{ launchctl_path }}/deploys.environments.mail.plist"
-    # - name: update config
-    #   copy:
-    #     src: ./files/conf.cfg
-    #     dest: "{{ project_path }}/conf.cfg"
-    # - name: update apple launchctl
-    #   copy:
-    #     src: ./files/deploys.pychgoods.monitor.plist
-    #     dest: "{{ launchctl_path }}/deploys.pychgoods.monitor.plist"
-    # - name: load pychgoods plist
-    #   command: "launchctl load {{ launchctl_path }}/deploys.pychgoods.monitor.plist"
-    #   notify: launchctl start pychgoods
+      notify: launchctl start env
+    - name: update apple launchctl
+      template:
+        src: "./files/deploys.{{ project_name }}.monitor.plist"
+        dest: "{{ launchctl_path }}/deploys.{{ project_name }}.monitor.plist"
+    - name: load {{ project_name }} plist
+      command: "launchctl load {{ launchctl_path }}/deploys.{{ project_name }}.monitor.plist"
+      notify: launchctl start "{{ project_name }}"
