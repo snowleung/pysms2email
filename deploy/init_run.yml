@@ -19,7 +19,7 @@
         dest: "{{ deploy_path }}/"
     - name: chmod +x to file
       file:
-        dest: {{ entry_file }}
+        dest: "{{ entry_file }}"
         mode: "u+x,g+x,o+x"
     - name: create log folder
       command: mkdir -p {{ log_path }}
