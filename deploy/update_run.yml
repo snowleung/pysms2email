@@ -13,15 +13,17 @@
     - name: reboot
       command: reboot
   tasks:
+### STOP PLIST ###
     - name: stop environment to launchctl
       command: launchctl stop deploys.environments.mail
     - name: stop project plist
       command: launchctl stop deploys.{{ project_name }}.monitor
+### UNLOAD PLIST ###      
     - name: unload environment to launchctl
       command: launchctl unload "{{ launchctl_path }}/deploys.environments.mail.plist"
     - name: unload project plist
       command: launchctl unload {{ launchctl_path }}/deploys.{{ project_name }}.monitor.plist
-
+### COPY SOURCE CODE ###
     - name: copy source code
       copy:
         src: ../pysms2email
@@ -35,7 +37,7 @@
         path: "{{ log_path }}"
         state: directory
         mode: "u+wrx,g+rx,o+rx"
-
+### COPY PLIST ###
     - name: copy environment variable plist
       template:
         src: ./files/deploys.environments.mail.plist
@@ -44,12 +46,12 @@
       template:
         src: ./files/deploys.{{ project_name }}.monitor.plist
         dest: "{{ launchctl_path }}/deploys.{{ project_name }}.monitor.plist"
-
+### LOAD PLIST ###
     - name: load environment to launchctl
       command: launchctl load "{{ launchctl_path }}/deploys.environments.mail.plist"
     - name: load project plist
       command: launchctl load "{{ launchctl_path }}/deploys.{{ project_name }}.monitor.plist"
-
+### START PLIST ###
     - name: execute environments
       command: launchctl start deploys.environments.mail
     - name: execute project plist
