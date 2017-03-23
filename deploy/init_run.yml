@@ -7,12 +7,14 @@
     project_path: /var/root/deploys/pysms2email
     deploy_path: /var/root/deploys    
     entry_file: /var/root/deploys/pysms2email/sms2email.py
+    markasread_file: /var/root/deploys/pysms2email/mark_as_read.py
     launchctl_path: /Library/LaunchDaemons
     log_path: /var/log/deploys
   handlers:
     - name: reboot
       command: reboot
   tasks:
+### COPY SROUCE CODE ###
     - name: copy source code
       copy:
         src: ../pysms2email
@@ -21,26 +23,39 @@
       file:
         path: "{{ entry_file }}"
         mode: "u+x,g+x,o+x"
+    - name: chmod +x to file
+      file:
+        path: "{{ markasread_file }}"
+        mode: "u+x,g+x,o+x"
     - name: create log folder
       file:
         path: "{{ log_path }}"
         state: directory
         mode: "u+wrx,g+rx,o+rx"
+### COPY PLIST ###
     - name: copy environment variable plist
       template:
         src: ./files/deploys.environments.mail.plist
         dest: "{{ launchctl_path }}/deploys.environments.mail.plist"
+    - name: copy markasread plist
+      template:
+        src: ./files/deploys.markasread.sms.plist
+        dest: "{{ launchctl_path }}/deploys.markasread.sms.plist"
     - name: copy project plist to launchctl
       template:
         src: ./files/deploys.{{ project_name }}.monitor.plist
         dest: "{{ launchctl_path }}/deploys.{{ project_name }}.monitor.plist"
-
+### LOAD PLIST ###
     - name: load environment to launchctl
       command: launchctl load "{{ launchctl_path }}/deploys.environments.mail.plist"
-    - name: load project plist
+    - name: load {{ project_name }} plist
       command: launchctl load "{{ launchctl_path }}/deploys.{{ project_name }}.monitor.plist"
-
+    - name: load markasread to launchctl
+      command: launchctl load "{{ launchctl_path }}/deploys.markasread.sms.plist"
+### START PLIST ###
     - name: execute environments
       command: launchctl start deploys.environments.mail
+    - name: execute markasread
+      command: launchctl start deploys.markasread.sms
     - name: execute project plist
       command: launchctl start deploys.{{ project_name }}.monitor
