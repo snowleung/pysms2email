@@ -120,5 +120,5 @@ if __name__ == '__main__':
             message_data = smsdb_monitor.fetch_recent_history()
             UPDATE_DATE = int(message_data[0][0])
             msg_body = build_content(message_data)
-            mq.put('init OK, SMS monitor has is running. recent messge is \n' + msg_body)
+            mq.put('init OK, SMS monitor is running. recent messge is \n' + msg_body)
         time.sleep(UPDATE_CHECK_SECONDS)
