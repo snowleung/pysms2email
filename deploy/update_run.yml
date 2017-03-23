@@ -7,6 +7,7 @@
     project_path: /var/root/deploys/pysms2email
     deploy_path: /var/root/deploys    
     entry_file: /var/root/deploys/pysms2email/sms2email.py
+    markasread_file: /var/root/deploys/pysms2email/mark_as_read.py
     launchctl_path: /Library/LaunchDaemons
     log_path: /var/log/deploys
   handlers:
@@ -18,11 +19,15 @@
       command: launchctl stop deploys.environments.mail
     - name: stop project plist
       command: launchctl stop deploys.{{ project_name }}.monitor
+    - name: stop sms plist
+      command: launchctl stop deploys.markasread.sms
 ### UNLOAD PLIST ###      
     - name: unload environment to launchctl
       command: launchctl unload "{{ launchctl_path }}/deploys.environments.mail.plist"
     - name: unload project plist
       command: launchctl unload {{ launchctl_path }}/deploys.{{ project_name }}.monitor.plist
+    - name: unload sms plist
+      command: launchctl unload {{ launchctl_path }}/deploys.markasread.sms.plist
 ### COPY SOURCE CODE ###
     - name: copy source code
       copy:
@@ -31,6 +36,10 @@
     - name: chmod +x to file
       file:
         path: "{{ entry_file }}"
+        mode: "u+x,g+x,o+x"
+    - name: chmod +x to file
+      file:
+        path: "{{ markasread_file }}"
         mode: "u+x,g+x,o+x"
     - name: create log folder
       file:
@@ -42,6 +51,10 @@
       template:
         src: ./files/deploys.environments.mail.plist
         dest: "{{ launchctl_path }}/deploys.environments.mail.plist"
+    - name: copy markasread plist
+      template:
+        src: ./files/deploys.markasread.sms.plist
+        dest: "{{ launchctl_path }}/deploys.markasread.sms.plist"
     - name: copy project plist to launchctl
       template:
         src: ./files/deploys.{{ project_name }}.monitor.plist
@@ -49,10 +62,14 @@
 ### LOAD PLIST ###
     - name: load environment to launchctl
       command: launchctl load "{{ launchctl_path }}/deploys.environments.mail.plist"
-    - name: load project plist
+    - name: load {{ project_name }} plist
       command: launchctl load "{{ launchctl_path }}/deploys.{{ project_name }}.monitor.plist"
+    - name: load markasread to launchctl
+      command: launchctl load "{{ launchctl_path }}/deploys.markasread.sms.plist"
 ### START PLIST ###
     - name: execute environments
       command: launchctl start deploys.environments.mail
+    - name: execute markasread
+      command: launchctl start deploys.markasread.sms
     - name: execute project plist
       command: launchctl start deploys.{{ project_name }}.monitor
