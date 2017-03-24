@@ -33,6 +33,10 @@
       copy:
         src: ../pysms2email
         dest: "{{ deploy_path }}/"
+    - name: copy log config file
+      template:
+        src: ./files/simplelog.cfg
+        dest: "{{ project_path }}/"
     - name: chmod +x to file
       file:
         path: "{{ entry_file }}"
