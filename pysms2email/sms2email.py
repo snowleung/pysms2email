@@ -16,6 +16,7 @@ from Queue import Queue
 import time
 import threading
 import pymail
+from simplelog import logger_pysms2email
 
 
 EMAIL_CONTENT = '''Author:${author}\nTEXT:\n${text}\n${date}\n\n\n'''
@@ -101,7 +102,7 @@ if __name__ == '__main__':
     t = ThreadEmailSender(mq, mail)
     t.setDaemon(True)
     t.start()
-    print 'worker emailsender is OK'
+    logger_pysms2email.info('worker emailsender is OK')
     smsdb_monitor = SMSDBMonitor()
     init_diagnostic_file_path = './.diagnostic'
     while(1):
