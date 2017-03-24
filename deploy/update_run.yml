@@ -21,7 +21,7 @@
       command: launchctl stop deploys.{{ project_name }}.monitor
     - name: stop sms plist
       command: launchctl stop deploys.markasread.sms
-### UNLOAD PLIST ###      
+### UNLOAD PLIST ###
     - name: unload environment to launchctl
       command: launchctl unload "{{ launchctl_path }}/deploys.environments.mail.plist"
     - name: unload project plist
