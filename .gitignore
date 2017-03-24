@@ -1,5 +1,7 @@
 #user passw
 secrets.yml
+# config file, see *.cfg.example
+*.cfg
 
 # Created by https://www.gitignore.io/api/python,osx,emacs,vim
 
