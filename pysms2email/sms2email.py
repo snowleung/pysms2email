@@ -99,10 +99,10 @@ def run_diagnostic(init_diagnostic_file_path='./diagnostic'):
 
 if __name__ == '__main__':
     mail = pymail.Pymail(os.environ.get('USER_MAIL'), os.environ.get('USER_PASSWD'), os.environ.get('MAIL_TO'))
+    logger_pysms2email.info('worker emailsender is OK')
     t = ThreadEmailSender(mq, mail)
     t.setDaemon(True)
     t.start()
-    logger_pysms2email.info('worker emailsender is OK')
     smsdb_monitor = SMSDBMonitor()
     init_diagnostic_file_path = './.diagnostic'
     while(1):
