@@ -14,8 +14,12 @@
     <!-- 运行间隔，与StartCalenderInterval使用其一，单位为秒 -->
     <key>StartCalendarInterval</key>
     <dict>
-      <key>Day</key>
-      <integer>7</integer>
+      <key>Hour</key>
+      <integer>11</integer>
+      <key>Minute</key>
+      <integer>15</integer>
+      <key>Weekday</key>
+      <integer>6</integer>
     </dict>
 
     <key>Debug</key>
