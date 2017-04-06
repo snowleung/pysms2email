@@ -3,6 +3,7 @@
 import sqlite3 as sql
 import string
 import os
+import time
 
 SMSDB_PATH = r'''/var/mobile/Library/SMS/sms.db'''
 SMSDB = sql.connect(SMSDB_PATH)
@@ -13,3 +14,4 @@ SMSDB.commit()
 output = '%i' % SMSDB.total_changes
 print output
 os.system('say message as read')
+time.sleep(12)                  # if script not done too fast, apple think it maybe **crash**.
