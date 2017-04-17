@@ -30,7 +30,7 @@ sys.stdout = streamWriter(sys.stdout)
 
 
 UPDATE_DATE = -1
-UPDATE_CHECK_SECONDS = 30
+UPDATE_CHECK_SECONDS = 10
 
 mq = Queue()
 
@@ -82,10 +82,21 @@ class ThreadEmailSender(threading.Thread):
         self.sender = _sender
 
     def run(self):
+        retry = 3
         while(True):
             item = self.queue.get()
             if item:
-                self.sender.send_mail('SMS on IPhone4', item)
+                try:
+                    self.sender.send_mail('SMS on IPhone4', item)
+                    retry = 3   # send success, reset retry times.
+                except Exception as ex:
+                    logger_pysms2email.error(ex)
+                    if retry == 0:
+                        logger_pysms2email.info(item) # send message fail, log it.
+                    else:
+                        retry -= 1
+                        self.queue.put(item)
+                    time.sleep(5)
             time.sleep(2)
 
 
