@@ -15,15 +15,11 @@
       command: reboot
   tasks:
 ### STOP PLIST ###
-    - name: stop environment to launchctl
-      command: launchctl stop deploys.environments.mail
     - name: stop project plist
       command: launchctl stop deploys.{{ project_name }}.monitor
     - name: stop sms plist
       command: launchctl stop deploys.markasread.sms
 ### UNLOAD PLIST ###
-    - name: unload environment to launchctl
-      command: launchctl unload "{{ launchctl_path }}/deploys.environments.mail.plist"
     - name: unload project plist
       command: launchctl unload {{ launchctl_path }}/deploys.{{ project_name }}.monitor.plist
     - name: unload sms plist
@@ -55,10 +51,6 @@
         state: directory
         mode: "u+wrx,g+rx,o+rx"
 ### COPY PLIST ###
-    - name: copy environment variable plist
-      template:
-        src: ./files/deploys.environments.mail.plist
-        dest: "{{ launchctl_path }}/deploys.environments.mail.plist"
     - name: copy markasread plist
       template:
         src: ./files/deploys.markasread.sms.plist
@@ -68,15 +60,11 @@
         src: ./files/deploys.{{ project_name }}.monitor.plist
         dest: "{{ launchctl_path }}/deploys.{{ project_name }}.monitor.plist"
 ### LOAD PLIST ###
-    - name: load environment to launchctl
-      command: launchctl load "{{ launchctl_path }}/deploys.environments.mail.plist"
     - name: load {{ project_name }} plist
       command: launchctl load "{{ launchctl_path }}/deploys.{{ project_name }}.monitor.plist"
     - name: load markasread to launchctl
       command: launchctl load "{{ launchctl_path }}/deploys.markasread.sms.plist"
 ### START PLIST ###
-    - name: execute environments
-      command: launchctl start deploys.environments.mail
     - name: execute markasread
       command: launchctl start deploys.markasread.sms
     - name: execute project plist
