@@ -50,15 +50,11 @@
         src: ./files/deploys.{{ project_name }}.monitor.plist
         dest: "{{ launchctl_path }}/deploys.{{ project_name }}.monitor.plist"
 ### LOAD PLIST ###
-    - name: load environment to launchctl
-      command: launchctl load "{{ launchctl_path }}/deploys.environments.mail.plist"
     - name: load {{ project_name }} plist
       command: launchctl load "{{ launchctl_path }}/deploys.{{ project_name }}.monitor.plist"
     - name: load markasread to launchctl
       command: launchctl load "{{ launchctl_path }}/deploys.markasread.sms.plist"
 ### START PLIST ###
-    - name: execute environments
-      command: launchctl start deploys.environments.mail
     - name: execute markasread
       command: launchctl start deploys.markasread.sms
     - name: execute project plist
