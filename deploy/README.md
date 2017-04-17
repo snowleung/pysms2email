@@ -6,14 +6,22 @@ use [Ansible](http://docs.ansible.com/ansible/) to do all
 ##USAGE
 
 **STEP 1**: install [Ansible](http://docs.ansible.com/ansible/intro_installation.html)
+
 **STEP 2**: modify invertory file(deploy/playbooks/) to make your device reachable.
-**STEP 3**: modify secrets.yml(deploy/playbooks/secrets.yml.exmaple), example following:
+
+**STEP 3**: Modify file.
+
+1. modify secrets.yml(deploy/playbooks/secrets.yml.exmaple), example following:
 ```
 sender_mail: sender_mail
 sender_pwd: password
 mail_to: receiver_mail_split_by_comma
 ```
+2. mv mail_env.cfg.example mail_env.cfg
+3. mv simplelog.cfg.example simplelog.cfg
+
 **STEP 4**:
+
 ```
 cd deploy
 ansible-playbook init_run.yml
