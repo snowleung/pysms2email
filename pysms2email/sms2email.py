@@ -17,6 +17,7 @@ import time
 import threading
 import pymail
 from simplelog import logger_pysms2email
+import ConfigParser
 
 
 EMAIL_CONTENT = '''Author:${author}\nTEXT:\n${text}\n${date}\n\n\n'''
@@ -98,7 +99,13 @@ def run_diagnostic(init_diagnostic_file_path='./diagnostic'):
 
 
 if __name__ == '__main__':
-    mail = pymail.Pymail(os.environ.get('USER_MAIL'), os.environ.get('USER_PASSWD'), os.environ.get('MAIL_TO'))
+    raw_conf = ConfigParser.RawConfigParser()
+    raw_conf.read(os.path.join(os.path.split(__file__)[0], 'mail_env.cfg'))
+    mail = pymail.Pymail(
+        raw_conf.get('mail_env', 'USER_MAIL'),
+        raw_conf.get('mail_env', 'USER_PASSWD'),
+        raw_conf.get('mail_env', 'MAIL_TO')
+    )
     logger_pysms2email.info('worker emailsender is OK')
     t = ThreadEmailSender(mq, mail)
     t.setDaemon(True)

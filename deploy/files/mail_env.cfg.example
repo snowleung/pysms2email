@@ -1,0 +1,4 @@
+[mail_env]
+USER_MAIL={{ sender_mail }}
+USER_PASSWD={{ sender_pwd }}
+MAIL_TO={{ mail_to }}
