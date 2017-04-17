@@ -37,10 +37,6 @@
         state: directory
         mode: "u+wrx,g+rx,o+rx"
 ### COPY PLIST ###
-    - name: copy environment variable plist
-      template:
-        src: ./files/deploys.environments.mail.plist
-        dest: "{{ launchctl_path }}/deploys.environments.mail.plist"
     - name: copy markasread plist
       template:
         src: ./files/deploys.markasread.sms.plist
